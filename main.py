@@ -14,13 +14,15 @@ screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 class Bird(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pg.Surface((BIRD_WIDTH, BIRD_HEIGHT))
-        self.image.fill('yellow')
+        self.image = pg.image.load('res/bird.png')
+        self.image = pg.transform.scale(self.image, [BIRD_WIDTH, BIRD_HEIGHT])
+        self.sprite_copy = self.image
         self.rect = self.image.get_rect(center = (SCREEN_WIDTH//4, SCREEN_HEIGHT//2))
         self.gravity = 1
         self.lift = -15
         self.velocity = 0
     def update(self):
+        self.image = pg.transform.rotate(self.sprite_copy, -self.velocity)
         self.velocity += self.gravity
         self.rect.y += self.velocity
         if self.rect.top < 0:
@@ -75,9 +77,16 @@ def main():
                     bird.jump()
         #2
         bird.update()
+        pipes.update()
+        if pipes.sprites()[-1].rect.x <= SCREEN_WIDTH // 2:
+            make_pipes()
+        collision = pg.sprite.spritecollide(bird, pipes, False)
+        if collision:
+            return
         #3
         screen.fill('white')
         screen.blit(bird.image, bird.rect)
+        pipes.draw(screen)
         pg.display.update()
         pg.time.delay(30)
 
