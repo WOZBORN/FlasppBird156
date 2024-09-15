@@ -4,19 +4,26 @@ import pygame as pg
 
 pg.init()
 
+# Название игры
+pg.display.set_caption("Бешеный Птиц")
+
+# Постоянные параметры
 SCREEN_WIDTH, SCREEN_HEIGHT = 480, 640
 BIRD_WIDTH, BIRD_HEIGHT = 50, 50
 PIPE_WIDTH, PIPE_GAP = 80, 250
 SPEED = 5
 
+# Переменные игры
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 score = 0
 font = pg.font.SysFont('cicansms', 32)
 
+# Функция, рисующая счёт
 def draw_score():
     score_text = font.render(f"Счёт: {round(score)}", True, "black")
     screen.blit(score_text, [10, 10])
 
+# Класс птицы
 class Bird(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -40,6 +47,7 @@ class Bird(pg.sprite.Sprite):
     def jump(self):
         self.velocity = self.lift
 
+# Класс трубы
 class Pipe(pg.sprite.Sprite):
     TOP = 1
     BOTTOM = 2
@@ -60,18 +68,21 @@ class Pipe(pg.sprite.Sprite):
             self.kill()
 
 
+# Создание спройтов и групп спрайтов
 bird = Bird()
 pipes = pg.sprite.Group()
 
+# Функция, создающая трубы
 def make_pipes():
     gap_start = random.randint(50, SCREEN_HEIGHT - PIPE_GAP - 50)
     top_pipe = Pipe(Pipe.TOP, gap_start)
     bottom_pipe = Pipe(Pipe.BOTTOM, gap_start)
     pipes.add(top_pipe, bottom_pipe)
 
-
+# Создание труб
 make_pipes()
 
+# Главный цикл игры
 def main():
     global score
     score = 0
