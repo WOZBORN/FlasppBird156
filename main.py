@@ -10,6 +10,12 @@ PIPE_WIDTH, PIPE_GAP = 80, 250
 SPEED = 5
 
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+score = 0
+font = pg.font.SysFont('cicansms', 32)
+
+def draw_score():
+    score_text = font.render(f"Счёт: {round(score)}", True, "black")
+    screen.blit(score_text, [10, 10])
 
 class Bird(pg.sprite.Sprite):
     def __init__(self):
@@ -46,7 +52,8 @@ class Pipe(pg.sprite.Sprite):
             self.rect = self.image.get_rect(bottomleft=(SCREEN_WIDTH, gap_start))
         elif type == self.BOTTOM:
             self.rect = self.image.get_rect(topleft=(SCREEN_WIDTH, gap_start + PIPE_GAP))
-            self.passed = False
+        self.passed = False
+
     def update(self):
         self.rect.x -= SPEED
         if self.rect.right < 0:
@@ -66,8 +73,10 @@ def make_pipes():
 make_pipes()
 
 def main():
+    global score
+    score = 0
     while True:
-        #1
+        #1 События
         events = pg.event.get()
         for e in events:
             if e.type == pg.QUIT:
@@ -75,7 +84,11 @@ def main():
             if e.type == pg.KEYDOWN:
                 if e.key == pg.K_SPACE:
                     bird.jump()
-        #2
+        #2 Логика игры
+        for pipe in pipes:
+            if pipe.rect.right < bird.rect.left and not pipe.passed:
+                pipe.passed = True
+                score += 0.5
         bird.update()
         pipes.update()
         if pipes.sprites()[-1].rect.x <= SCREEN_WIDTH // 2:
@@ -83,10 +96,11 @@ def main():
         collision = pg.sprite.spritecollide(bird, pipes, False)
         if collision:
             return
-        #3
+        #3 Рендеринг (отрисовка)
         screen.fill('white')
         screen.blit(bird.image, bird.rect)
         pipes.draw(screen)
+        draw_score()
         pg.display.update()
         pg.time.delay(30)
 
