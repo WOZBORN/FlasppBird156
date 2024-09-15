@@ -1,6 +1,7 @@
 import random
 
 import pygame as pg
+import pygame_menu as menu
 
 pg.init()
 
@@ -69,7 +70,6 @@ class Pipe(pg.sprite.Sprite):
 
 
 # Создание спройтов и групп спрайтов
-bird = Bird()
 pipes = pg.sprite.Group()
 
 # Функция, создающая трубы
@@ -79,13 +79,14 @@ def make_pipes():
     bottom_pipe = Pipe(Pipe.BOTTOM, gap_start)
     pipes.add(top_pipe, bottom_pipe)
 
-# Создание труб
-make_pipes()
 
 # Главный цикл игры
 def main():
     global score
     score = 0
+    bird = Bird()
+    pipes.empty()
+    make_pipes()
     while True:
         #1 События
         events = pg.event.get()
@@ -106,6 +107,7 @@ def main():
             make_pipes()
         collision = pg.sprite.spritecollide(bird, pipes, False)
         if collision:
+            show_end_screen()
             return
         #3 Рендеринг (отрисовка)
         screen.fill('white')
@@ -115,6 +117,18 @@ def main():
         pg.display.update()
         pg.time.delay(30)
 
+def show_end_screen():
+    end_menu = menu.Menu('ТЫ ПАГИП!', SCREEN_WIDTH, SCREEN_HEIGHT, theme=menu.themes.THEME_DARK)
+    end_menu.add.label(f'Твой счёт: {round(score)}', font_size=36)
+    end_menu.add.button('Рестарт', main)
+    end_menu.add.button('Выйти', menu.events.EXIT)
+    end_menu.mainloop(screen)
+
+def show_start_screen():
+    end_menu = menu.Menu('Бешеный Птиц', SCREEN_WIDTH, SCREEN_HEIGHT, theme=menu.themes.THEME_DARK)
+    end_menu.add.button('Старт', main)
+    end_menu.add.button('Выйти', menu.events.EXIT)
+    end_menu.mainloop(screen)
 
 if __name__ == '__main__':
-    main()
+    show_start_screen()
